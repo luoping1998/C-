@@ -40,6 +40,7 @@ Poly* Create(){
 
 void Print(Poly *head){
 	Poly *p=head->next;
+	if(!p) printf("0");
 	while(p){
 		if(p->coef==1){
 			if(p->exp==1) printf("X");
@@ -171,6 +172,49 @@ Poly *Jian(Poly *pa,Poly *pb){
 	return Result;
 }
 
+void Qiudao(Poly *pa){
+	Poly *q;
+	q=pa->next;
+	while(q){
+		if(q->exp==0){
+			q->coef=0;
+		}
+		else {
+			q->coef*=q->exp;
+			q->exp-=1;
+		}
+		q=q->next; 
+	}	
+} 
+
+Poly *Chen(Poly *pa,Poly *pb){
+	Poly *a,*b,*c,*p;
+	c=(Poly *)malloc(sizeof(Poly));
+	p=c;
+	for(a=pa->next;a!=NULL;a=a->next){
+		for(b=pb->next;b!=NULL;b=b->next){
+			Poly *pnew=(Poly *)malloc(sizeof(Poly));
+			pnew->exp=a->exp+b->exp;
+			pnew->coef=a->coef*b->coef;
+			p->next=pnew;
+			p=pnew;	
+		}
+	} 
+	p->next=NULL;
+	
+	Poly *m,*n,*q;
+	m=c->next;
+	for(n=c->next;n!=NULL;n=n->next){
+		for(q=n->next;q!=NULL;m=q,q=q->next){
+			if(n->exp==q->exp){
+				n->coef+=q->coef;
+				m->next=q->next;
+			}
+		}
+	}
+	return c;
+}
+
 int main(){
 	int re;
 	
@@ -201,6 +245,26 @@ int main(){
 	printf("\nJIAN(pb-pa):\npd=");
 	Print(He);
 	
+	printf("\nqiudao:\n");
+	Qiudao(Ha);
+	printf("\npa'=");
+	Print(Ha);
+	
+	Qiudao(Hb);
+	printf("\npb'=");
+	Print(Hb);
+	
+	Qiudao(Hc);
+	printf("\npc'=");
+	Print(Hc);
+	
+	Qiudao(Hd);
+	printf("\npd'=");
+	Print(Hd);
 	return 0;	
+	
+	Poly * He=Chen(Ha,Hb);
+	printf("\npa*pb=");
+	Print(He);
 }
 
