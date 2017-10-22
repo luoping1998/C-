@@ -3,7 +3,7 @@
 #define MAXSIZE 1000
 typedef struct{
 	int row,col;
-	float num;
+	int num;
 }Triple;
 
 typedef struct{
@@ -46,7 +46,7 @@ void Enter(TSMatrix *M){
 	for(i=0;i<M->m;i++){
 		for(j=0;j<M->n;j++){
 			scanf("%d",&num);
-			if(num){
+			if(num!=0){
 				M->data[M->len].num=num;
 				M->data[M->len].row=i;
 				M->data[M->len].col=j;
@@ -71,58 +71,59 @@ void Print(TSMatrix *M){
 		printf("\n");
 	}
 }
-//
-//int Chen(TSMatrix *M,TSMatrix *T){
-//	int i,j,s,num;
-//	i=j=s=0;
-//	TSMatrix *ZT=malloc(sizeof(TSMatrix));
-//	FastTransTSMatrix(T,ZT);
-//	while(i<M->len&&j<ZT->len){
-//		if(M->data[i].row==ZT->data[j].row &&M->data[i].col==ZT->data[j].col){
-//			num=M->data[i].num*ZT->data[j].num;
-//			j++;i++;
-//		}
-//		else{
-//			if(M->data[i].row!=ZT->data[j].row && M->data[i].col!=ZT->data[j].col){
-//				if(M->data[i].row<ZT->data[i].row){
-//					i++;
-//				}
-//				else{
-//					j++;
-//				}
-//			}
-//			else if(M->data[i].row==ZT->data[j].row && M->data[i].col!=M->data[j].col){
-//				if(M->data[i].col<ZT->data[j].col){
-//					i++;
-//				}
-//				else{
-//					j++;
-//				}
-//			}
-//			else{
-//				if(M->data[i].row<ZT->data[j].row){
-//					i++;
-//				}
-//				else{
-//					j++;
-//				}
-//			}
-//			num=0;
-//		}
-//		s+=num;
-//	}
-//	return s;
-//}
-//int Chu(TSMatrix *M,TSMatrix *T){
-//	TSMatrix *ZT=malloc(sizeof(TSMatrix));
-//	FastTransTSMatrix(T,ZT);
-//	int i,s;
-//	for(i=0;i<ZT->len;i++){
-//		ZT->data[i].num=1.0/ZT->data[i].num;
-//	}
-//	s=Chen(M,ZT);
-//	return s;
-//}
+
+int Chen(TSMatrix *M,TSMatrix *T){
+	int i,j,s,num;
+	i=j=s=0;
+	TSMatrix *ZT=malloc(sizeof(TSMatrix));
+	FastTransTSMatrix(T,ZT);
+	while(i<M->len&&j<ZT->len){
+		if(M->data[i].row==ZT->data[j].row &&M->data[i].col==ZT->data[j].col){
+			num=M->data[i].num*ZT->data[j].num;
+			j++;i++;
+		}
+		else{
+			if(M->data[i].row!=ZT->data[j].row && M->data[i].col!=ZT->data[j].col){
+				if(M->data[i].row<ZT->data[i].row){
+					i++;
+				}
+				else{
+					j++;
+				}
+			}
+			else if(M->data[i].row==ZT->data[j].row && M->data[i].col!=M->data[j].col){
+				if(M->data[i].col<ZT->data[j].col){
+					i++;
+				}
+				else{
+					j++;
+				}
+			}
+			else{
+				if(M->data[i].row<ZT->data[j].row){
+					i++;
+				}
+				else{
+					j++;
+				}
+			}
+			num=0;
+		}
+		s+=num;
+	}
+	return s;
+}
+
+int Chu(TSMatrix *M,TSMatrix *T){
+	TSMatrix *ZT=malloc(sizeof(TSMatrix));
+	FastTransTSMatrix(T,ZT);
+	int i,s;
+	for(i=0;i<ZT->len;i++){
+		ZT->data[i].num=1.0/ZT->data[i].num;
+	}
+	s=Chen(M,ZT);
+	return s;
+}
 
 TSMatrix *Add(TSMatrix *M,TSMatrix *T){
 	int i,j,k;
@@ -215,26 +216,21 @@ int main(){
 	T=malloc(sizeof(TSMatrix));
 	Z=malloc(sizeof(TSMatrix));
 	Enter(M);
-	printf("r c num\n");
-	for(i=0;i<M->len;i++){
-		printf("%d %d %d\n",M->data[i].row,M->data[i].col,M->data[i].num); 
-	}
-//	printf("\n\n");
 //	Print(M);
-//	Enter(T);
-//	S=Chen(M,T);
-//	printf("M*T=%d\n",S);
-//	C=Chu(M,T);
-//	printf("M/T=%d\n",C);
-//	FastTransTSMatrix(M,Z);
-//	printf("A^-1=\n");
-//	Print(Z);
-//	TSMatrix *A=Add(M,T);
-//	printf("M+T=\n");
-//	Print(A);
-//	TSMatrix *B=Jian(M,T);
-//	printf("M-T=\n");
-//	Print(B);
+	Enter(T);
+	S=Chen(M,T);
+	printf("M*T=%d\n",S);
+	C=Chu(M,T);
+	printf("M/T=%d\n",C);
+	FastTransTSMatrix(M,Z);
+	printf("A^-1=\n");
+	Print(Z);
+	TSMatrix *A=Add(M,T);
+	printf("M+T=\n");
+	Print(A);
+	TSMatrix *B=Jian(M,T);
+	printf("M-T=\n");
+	Print(B);
 
 	return 0; 
 }
