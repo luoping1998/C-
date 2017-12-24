@@ -104,10 +104,7 @@ void Create(AdjMatrix *G) {
 	for(k=0;k<G->arcnum;k++){
 		printf("\nNo.%d条边：\n\t顶点V",k+1);
 		getchar();
-		scanf("%c",&vex1);
-		printf("<------>顶点V");
-		getchar();
-		scanf("%c",&vex2);
+		scanf("%c->%c",&vex1,&vex2);
 		weight=1;
 		i=LocateVex(G,vex1);
 		j=LocateVex(G,vex2);
@@ -150,7 +147,7 @@ void BFS(AdjMatrix *G, int index){
 	for(i=1;i<=G->vexnum;i++){
 		visited[i]=0;				//初始化标志数组 
 	}
-	printf("广度优先遍历非递归：");
+	printf("\n广度优先遍历非递归：\n");
 	Enter(S,index);
 	while(!Empty_Q(S)){
 		v=First_Q(S);
@@ -168,6 +165,38 @@ void BFS(AdjMatrix *G, int index){
 		Quite(S);		
 	}
 }
+//
+////深度优先便利连通子图
+//void DFS(AdjMatrix *G, int index){
+//	int visited[MAXVEX];			//设置访问标志数组 
+//	Stack *S=(Stack*)malloc(sizeof(Stack));
+//	S->top=S->rear=-1;
+//	int i,w,v;
+//	for(i=1;i<=G->vexnum;i++){
+//		visited[i]=0;				//初始化标志数组 
+//	}
+//	printf("\n深度优先遍历非递归：\n");
+//	Push(S,index);
+//	while(!Empty(S)){
+//		v=First(S);
+//		if(!visited[v]){
+//			printf("%c",G->vex[v]);
+//			visited[v]=1;
+//		}
+//		for(i=1;i<=G->vexnum;i++){
+//			if(G->arcs[v][i]!=INFINITY&&visited[i]!=1){
+//				printf("%c",G->vex[i]);
+//				visited[i]=1;
+//				Push(S,i);
+//				v=i;
+//				break;
+//			}
+//		}
+//		if(i==G->vexnum+1){
+//			Pop(S);			
+//		}
+//	}
+//} 
 
 //深度优先便利连通子图
 void DFS(AdjMatrix *G, int index){
@@ -178,7 +207,7 @@ void DFS(AdjMatrix *G, int index){
 	for(i=1;i<=G->vexnum;i++){
 		visited[i]=0;				//初始化标志数组 
 	}
-	printf("深度优先遍历非递归：");
+	printf("\n深度优先遍历非递归：");
 	Push(S,index);
 	while(!Empty(S)){
 		v=First(S);
@@ -201,6 +230,39 @@ void DFS(AdjMatrix *G, int index){
 	}
 } 
 
+//入度 
+void InDu(AdjMatrix *G){
+	int cnt[G->vexnum];
+	int i,j;
+	for(i = 1;i <=G->vexnum;i++)
+		cnt[i] = 0;
+	printf("In Du:\n");
+	for(i = 1;i <=G->vexnum;i++)
+	{
+		for(j = 1;j <=G->vexnum;j++)
+			if(G->arcs[j][i]== 1)
+				cnt[i]++;
+		printf("%c---%d\n",G->vex[i],cnt[i]);
+	} 
+}
+
+//出度 
+void OutDu(AdjMatrix *G)
+{
+	int cnt[G->vexnum];
+	int i,j;
+	printf("Out Du:\n");
+	for(i = 1;i <=G->vexnum;i++)
+		cnt[i] = 0;
+	for(i = 1;i <=G->vexnum;i++)
+	{
+		for(j = 1;j <=G->vexnum;j++)
+			if(G->arcs[i][j]== 1)
+				cnt[i]++;
+		printf("%c---%d\n",G->vex[i],cnt[i]);
+	}		
+ }       
+    
 int main(){
 	AdjMatrix *G ;
 	int i;
@@ -212,6 +274,9 @@ int main(){
 	Display(G);
 	BFS(G,1); 
 	DFS(G,1);
+	printf("\n深度优先遍历：\n"); 
 	dgDFS(G,1);
+	OutDu(G);
+	InDu(G);
 	return 0;
 }
