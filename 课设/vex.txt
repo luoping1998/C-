@@ -1,0 +1,10 @@
+0 Guangzhou
+1 Changsha
+2 Japan
+3 Tuerqi
+4 Xian
+5 Weinan
+6 Loudi
+7 Beijing
+8 Yulin
+9 Fujian
