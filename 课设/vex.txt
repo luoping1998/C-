@@ -2,9 +2,9 @@
 1 Changsha
 2 Japan
 3 Tuerqi
-4 Xian
-5 Weinan
-6 Loudi
-7 Beijing
-8 Yulin
-9 Fujian
+4 Weinan
+5 Loudi
+6 Beijing
+7 Yulin
+8 Fujian
+9 Nanjing

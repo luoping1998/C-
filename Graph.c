@@ -224,7 +224,7 @@ void DFS(AdjMatrix *G, int index){
 				break;
 			}
 		}
-		if(i==6){
+		if(i==G->vexnum+1){
 			Pop(S);			
 		}
 	}

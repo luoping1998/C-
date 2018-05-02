@@ -276,10 +276,8 @@ AdjMatrix * Delete(AdjMatrix *G){
 		return G;
 	}
 	fflush(stdin);
-//	printf("index = %d\n",index);
 	for(i=index;i<G->vexnum;i++){
 		strcpy(G->vex[i].name,G->vex[i+1].name);
-	//	printf("now=%s\n",G->vex[i].name);
 	}
 	G->vexnum--;
 	if((fq = fopen("./vex.txt","w+")) == NULL)      //判断文件是否存在及可读  
@@ -293,27 +291,21 @@ AdjMatrix * Delete(AdjMatrix *G){
 			} else{
 				fprintf(fq,"%d %s\n",i,G->vex[i].name);
 			}
-    		
-    		//printf("now index=%d | name = %s\n",i,G->vex[i].name);
-		}
+   		}
 	}
 	fclose(fq);
 	
 	AdjMatrix *Copy=Create();
-//	Display(Copy);
 	if((fp = fopen("./acre.txt","w+")) == NULL)      //判断文件是否存在及可读  
     {	   
     	printf("Open Falied!");   
       	return G;   
     }  else{
-    		//printf("opened!\n");
 			for(i=0;i<Copy->vexnum;i++){
 				for(j=0;j<Copy->vexnum;j++){
-					//printf("count = %d\n",Copy->acre[i][j].count);
 					if(Copy->acre[i][j].count!=0){
 						strcpy(sCity,Copy->vex[i].name);
     					strcpy(eCity,Copy->vex[j].name);
-    				//	printf("now startcity:%s | endecity:%s\n",sCity,eCity);
     					for(k=0;k<Copy->acre[i][j].count;k++){
     						if(count==Copy->acrnum-1){
     							fprintf(fp,"%s %s %s %d.%d %d:%d:%d %d.%d %d:%d:%d %d %d %d" ,
@@ -339,7 +331,6 @@ AdjMatrix * Delete(AdjMatrix *G){
 			}
 		}
 	fclose(fp);
-//	Display(Copy);
 	return Copy;
 }
 
