@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>js parser</title>
+	<style type="text/css">
+		html, body {
+			width: 100%;
+			height: 100%;
+		}
+		.main{
+			width: 50%;
+			height: 100%;
+			float:left;
+			display: flex;
+			flex-direction: column;
+			border-right: 1px solid lightgray;
+		}
+		.res {
+			height: 100%;
+			overflow: hidden;
+		}
+
+		h3 {
+			padding: 20px;
+		}
+
+		#targ {
+			width: 92%;
+			height: 50%;
+			align-self: center;
+			outline: none;
+			font-size: 18px;
+			padding: 10px;
+			resize: none;
+			border: 1px solid lightgray;
+		}
+
+		#sub {
+			width: 150px;
+			height: 50px;
+			margin: 20px 20px 0 0 ;
+			align-self: flex-end;
+		}
+
+		.res .lef {
+			width: 50%;
+			height: 100%;
+			padding: 10px;
+			float: left;
+			border-right: 1px solid lightgray;
+		}
+
+		.lef span {
+			color: red;
+		}
+	</style>
+</head>
+<body>
+	<div class="main">
+		<h3>请输入一段js代码</h3>
+		<textarea id="targ"></textarea>
+		<button id="sub">js词法解析</button>
+	</div>
+	<div class="res">
+		<div class="lef"></div>
+		<div class="tab"></div>
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload = function () {
+		let targ = document.getElementById('targ');
+		let sub = document.getElementById('sub');
+		let lef = document.getElementsByClassName('lef')[0];
+		let arr = [];
+		sub.onclick = () => {
+			arr = Parser(targ.value);
+			let str = '<h4>二元组如下：</h4>';
+			arr.map((obj)=>{
+				let ss = (obj.type == 5) ? ('<span>error: line' + (obj.line+1) + ' ' + obj.value +'</span>') : ('(' + obj.value + ' ,' + obj.type + ')');
+				str += (ss+'<br/>');
+			})
+			lef.innerHTML = str;
+		}
+		/*
+		 * 关键字 0
+		 * 标识符（变量名） 1
+		 * 运算符 2
+		 * 界符 3
+		 * 数字 4
+		 * 错误 5
+		 */
+	}
+
+	function Parser(string) {
+		//关键字
+		let keyword = ['var', 'let', 'const', 'static', 'function', 'new', 'switch', 'case', 'break', 'if', 'else', 'while', 'do', 'continue',  'this', 'with', 'try', 'default', 'for', 'in', 'instanceof', 'typeof', 'catch', 'delete'];
+
+		//边界符
+		let side = ['(', ')', '{', '}', '[', ']', ',', ';', '.', '\'', '"'];
+		let codes = string.split("\n");
+		let results = [];
+		codes.map((code, index) => {	//对第index行代码code解析
+			let len = code.length, i, start, ss, str, sReg, flag, re;
+			let nReg = /[0-9]/;
+			for(i = 0; i < len; ) {
+				start = i;
+				//检测标识符和关键字
+				str = [];
+				sReg = /[a-zA-Z_]/;
+				nReg = /[0-9]/;
+				while(sReg.test(code[i]) && i < len){
+					sReg = /[0-9a-zA-Z_]/;
+					str.push(code[i]);
+					i ++;
+				}
+				if(str.length) {
+					ss = str.join('');
+					//检测是关键字还是标识符
+					if(keyword.indexOf(ss) === -1) {
+						re = {
+							value: ss,
+							line: index,
+							type: 1
+						}
+					}else {
+						re = {
+							value: ss,
+							line: index,
+							type: 0
+						}
+					}
+					results.push(re);
+					//标识符和关键字检测完
+					continue;
+				}
+
+				//检测数字
+				flag = 0;
+				while(nReg.test(code[i]) && i < len){
+					if(code[i] === '.') {
+						flag ++;
+					}
+					str.push(code[i]);
+					i ++;
+				}
+				if(str.length) {
+					let err = false;
+					while(sReg.test(code[i]) && i < len){
+						nReg = /[0-9.]/;
+						str.push(code[i]);
+						err = true;
+						i ++;
+					}
+					ss = str.join("");					
+					//出现错误
+					if(flag > 1 || err) {
+						re = {
+							value: str.join(""),
+							line: index,
+							type: 5
+						}
+					}else {
+						re = {
+							value: ss,
+							line: index,
+							type: 4
+						}
+					}
+					results.push(re);
+					continue;
+				}
+
+				//检测字符串
+				
+				
+				//检测边界符
+				if(side.indexOf(code[i]) != -1) {
+					re = {
+						value: code[i],
+						line: index,
+						type: 3
+					}
+					results.push(re);
+					i ++;
+					continue;
+				}
+
+				//检测运算符
+				switch(code[i]) {
+					case '+':
+						str.push(code[i]);
+						i ++;
+						if(code[i] == '=' || code[i] == '+') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '-':
+						str.push(code[i]);
+						i ++;
+						if(code[i] == '=' || code[i] == '-') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '*':
+						str.push(code[i]);
+						i ++;
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '/':
+						str.push(code[i]);
+						i ++;
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '%':
+						str.push(code[i]);
+						i ++;
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '>':
+						str.push(code[i]);
+						i ++;
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '<':
+						str.push(code[i]);
+						i ++;
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '=':
+						str.push(code[i]);
+						i ++;
+						//检测==
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						//检测===
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+						break;
+					case '!':
+						str.push(code[i]);
+						i ++;
+						//检测!=
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						//检测!==
+						if(code[i] == '=') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+					break;
+					case '&':
+						str.push(code[i]);
+						i ++;
+						//检测!=
+						if(code[i] == '&') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+					break;
+					case '|':
+						str.push(code[i]);
+						i ++;
+						//检测!=
+						if(code[i] == '|') {
+							str.push(code[i]);
+							i ++;
+						}
+						ss = str.join("");
+						re = {
+							value: ss,
+							line: index,
+							type: 2
+						}
+						results.push(re);
+					break;
+				}
+
+				//过滤空格,tab
+				while(code[i] === ' '||code[i] === '\t'||code[i] === '\r'){
+                    i++;
+                }
+
+                if(i === start) {
+                	re = {
+                		value: code[i],
+                		line: index,
+                		type: 5
+                	}
+                	results.push(re);
+                	flag=0;
+                	break;
+                }
+			}
+		})	
+	
+		return results;
+	}
+
+</script>
+</html>
